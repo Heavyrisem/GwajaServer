@@ -6,6 +6,7 @@ const upload = multer({
         destination: (req, file, cb) => {
             if (req.socket.remoteAddress){    
                 let name = req.socket.remoteAddress?.split("").reverse().splice(0, 3).reverse().join("");
+                if (name == "::1" || "0.1") name = "localhost"
                 console.log(name);
 
                 if (!fs.existsSync(name)) {
@@ -41,6 +42,11 @@ const GetFilelist = (path: string): Promise<{result?: Array<DataInfo>, err?: Nod
                 let info = await detailDataInfo(path+'/'+file.name);
                 if (info.err) return resolve({err: info.err});
                 
+                console.log(info.result?.path.split(path));
+                if (info.result) {
+                    info.result.path = info.result?.path.split(path)[info.result?.path.split(path).length - 1];
+                }
+
                 dirlist.push(info.result as DataInfo);
                 if (dirlist.length == files.length) return resolve({result: dirlist});
             });
