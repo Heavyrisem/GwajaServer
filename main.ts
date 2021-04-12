@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import {upload, GetFilelist, detailDataInfo} from './FileHandler';
+import {upload, GetFilelist, detailDataInfo, GetNameByIp} from './FileHandlers';
 
 const Server = express();
 
@@ -28,8 +28,7 @@ Server.post('/index', async (req, res) => {
 
     if (req.socket.remoteAddress && req.body.path) {
         
-        let path = req.socket.remoteAddress?.split("").reverse().splice(0, 3).reverse().join("");
-        if (path == "::1" || "0.1") path = "localhost";
+        let path = GetNameByIp(req.socket.remoteAddress);
         path += req.body.path.replace("..", "");
         path = path.replace("//", "/");
 
@@ -45,12 +44,11 @@ Server.post('/index', async (req, res) => {
 })
 
 Server.get('/download', async (req, res) => {
-    if (req.socket.remoteAddress && req.query.path != undefined) {    
+    if (req.socket.remoteAddress && req.query.path) {    
         console.log(req.socket.remoteAddress)
-        let name = req.socket.remoteAddress?.split("").reverse().splice(0, 3).reverse().join("");
-        if (name == "::1" || "0.1") name = "localhost"
+        let name = GetNameByIp(req.socket.remoteAddress);
 
-        let path = `${name}/${req.query.path as string}`;
+        let path = `${name}/${req.query.path}`;
 
         console.log('download req', req.query.path);
         let result = await detailDataInfo(path);

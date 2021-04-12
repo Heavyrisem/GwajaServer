@@ -1,6 +1,8 @@
 import multer from 'multer';
 import fs from 'fs';
 
+const Root = "/File/";
+
 const upload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
@@ -32,7 +34,7 @@ const GetFilelist = (path: string): Promise<{result?: Array<DataInfo>, err?: Nod
         
 
         let dirlist: Array<DataInfo> = [];
-        
+        path = Root+path;
         fs.readdir(path, {withFileTypes:true}, (err, files) => {
             
             if (err) return resolve({err: err});
